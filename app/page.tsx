@@ -45,13 +45,15 @@ function MyDropzone() {
       <div className="mt-10 flex justify-center items-center ">
         <div className=" flex justify-center items-center gap-10 ">
           {uploadedImage && (
-          <button
-            className="bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg"
-            onClick={handleCancel}>
-            キャンセル
-          </button>
+            <>
+              <button
+                className="bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg"
+                onClick={handleCancel}>
+                キャンセル
+              </button>
+              <button className= "bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg ">画像を送信</button>
+            </>
           )}
-          <button className= "bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg ">画像を送信</button>
         </div>
       </div>
     </div>
