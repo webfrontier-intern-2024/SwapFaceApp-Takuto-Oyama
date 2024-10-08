@@ -4,22 +4,56 @@ import {useDropzone} from 'react-dropzone';
 import Image from 'next/image';
 
 function MyDropzone() {
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isUploadSuccessful, setIsUploadSuccessful] = useState(false);
+
+  const handleSendImage = async () => {
+    if (!uploadedImage) return;
+
+    const formData = new FormData();
+    formData.append('file', uploadedImage);
+
+    try {
+      setIsUploading(true);
+
+      const apiUrl = "/api/upload";
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        body: formData,
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log("APIリザルト", result);
+        setIsUploadSuccessful(true);
+      } else {
+        console.error("APIエラー", response.statusText);
+      }
+    } catch (error) {
+      console.error("API通信エラー", error);
+    }
+  };
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
     const fileUrl = URL.createObjectURL(file);
-    setUploadedImage(fileUrl);
+    setImagePreview(fileUrl);
+    setUploadedImage(file);
   }, []);
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({
     onDrop,
     accept: {'image/png': [], 'image/jpeg': [], 'image/jpg': []},
-    multiple: false
+    multiple: false //一つのファイルのみ
   });
 
   // キャンセルボタンの処理
   const handleCancel = () => {
-    setUploadedImage(null); // 画像を削除（状態をnullに戻す）
+    setUploadedImage(null);
+    setImagePreview(null); // プレビュー用URLを削除
   };
 
   return (
@@ -31,8 +65,8 @@ function MyDropzone() {
       >
         <input {...getInputProps()} />
         {
-          uploadedImage ? (
-            <Image src={uploadedImage} width={300} height={300} alt="Uploaded" className="max-h-full max-w-full object-contain" />
+          imagePreview ? (
+            <Image src={imagePreview} width={300} height={300} alt="Uploaded" className="max-h-full max-w-full object-contain" />
           ) : (
             isDragActive ? (
               <p className="text-blue-500 font-bold">ファイルをここにドロップしてください...</p>
@@ -44,14 +78,23 @@ function MyDropzone() {
       </div>
       <div className="mt-10 flex justify-center items-center ">
         <div className=" flex justify-center items-center gap-10 ">
-          {uploadedImage && (
+        {uploadedImage && (
             <>
               <button
                 className="bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg"
-                onClick={handleCancel}>
-                キャンセル
+                onClick={handleCancel}
+              >
+                {isUploadSuccessful ? "戻る" : "キャンセル"}
               </button>
-              <button className= "bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg ">画像を送信</button>
+              {!isUploadSuccessful && (
+                <button
+                  className="bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg"
+                  onClick={handleSendImage}
+                  disabled={isUploading}
+                >
+                  {isUploading ? "送信中..." : "画像を送信"}
+                </button>
+              )}
             </>
           )}
         </div>
@@ -69,7 +112,7 @@ export default function Home() {
           <div className="flex flex-wrap sm:-m-4 -mx-4 -mb-10 -mt-4 md:space-y-0">
             <div className="p-4 md:w-1/3 max-w-[306px] flex">
               <div className="w-12 h-12 inline-flex items-center justify-center rounded-full bg-[#FF9501] text-white mb-4 flex-shrink-0">
-                <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" className="w-6 h-6" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-6 h-6" viewBox="0 0 24 24">
                   <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                 </svg>
               </div>
@@ -80,7 +123,7 @@ export default function Home() {
             </div>
             <div className="p-4 md:w-1/3 flex">
               <div className="w-12 h-12 inline-flex items-center justify-center rounded-full bg-[#FF9501] text-white mb-4 flex-shrink-0">
-                <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" className="w-6 h-6" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-6 h-6" viewBox="0 0 24 24">
                   <circle cx="6" cy="6" r="3"></circle>
                   <circle cx="6" cy="18" r="3"></circle>
                   <path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"></path>
@@ -93,7 +136,7 @@ export default function Home() {
             </div>
             <div className="p-4 md:w-1/3 flex">
               <div className="w-12 h-12 inline-flex items-center justify-center rounded-full  bg-[#FF9501] text-white mb-4 flex-shrink-0">
-                <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" className="w-6 h-6" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-6 h-6" viewBox="0 0 24 24">
                   <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
