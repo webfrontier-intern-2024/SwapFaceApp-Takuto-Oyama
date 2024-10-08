@@ -1,29 +1,61 @@
 "use client";
-import React, {useCallback} from "react";
+import React, {useCallback, useState} from "react";
 import {useDropzone} from 'react-dropzone';
+import Image from 'next/image';
 
 function MyDropzone() {
-  const onDrop = useCallback(acceptedFiles => {
-    // Do something with the files
-  }, [])
-  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0]
+    const fileUrl = URL.createObjectURL(file);
+    setUploadedImage(fileUrl);
+  }, []);
+
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({
+    onDrop,
+    accept: {'image/png': [], 'image/jpeg': [], 'image/jpg': []},
+    multiple: false
+  });
+
+  // キャンセルボタンの処理
+  const handleCancel = () => {
+    setUploadedImage(null); // 画像を削除（状態をnullに戻す）
+  };
 
   return (
-    <div
-    {...getRootProps()}
-    className={`border-dashed border-4 p-10 w-full max-w-4xl h-96 flex justify-center items-center text-center rounded-xl 
-    ${isDragActive ? "border-blue-500 bg-blue-50" : "border-orange-300"}`}
-    >
-    <input {...getInputProps()} />
-    {
-      isDragActive ? (
-        <p className="text-blue-500 font-bold">ファイルをここにドロップしてください...</p>
-      ) : (
-        <p className="text-gray-600 font-semibold">ファイルをドラッグ＆ドロップするか、クリックして選択してください</p>
-      )
-    }
-  </div>
-  )
+    <div className="w-full max-w-4xl flex flex-col items-center">
+      <div
+        {...getRootProps()}
+        className={`border-dashed border-4 p-10 w-full h-96 flex justify-center items-center text-center rounded-xl 
+        ${isDragActive ? "border-blue-500 bg-blue-50" : "border-orange-300"}`}
+      >
+        <input {...getInputProps()} />
+        {
+          uploadedImage ? (
+            <Image src={uploadedImage} width={300} height={300} alt="Uploaded" className="max-h-full max-w-full object-contain" />
+          ) : (
+            isDragActive ? (
+              <p className="text-blue-500 font-bold">ファイルをここにドロップしてください...</p>
+            ) : (
+              <p className="text-gray-600 font-semibold">ファイルをドラッグ＆ドロップするか、クリックして選択してください</p>
+            )
+          )
+        }
+      </div>
+      <div className="mt-10 flex justify-center items-center ">
+        <div className=" flex justify-center items-center gap-10 ">
+          {uploadedImage && (
+          <button
+            className="bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg"
+            onClick={handleCancel}>
+            キャンセル
+          </button>
+          )}
+          <button className= "bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg ">画像を送信</button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -73,12 +105,6 @@ export default function Home() {
         </div>
       </section>
       <MyDropzone/>
-      <div className="mt-10 flex justify-center items-center ">
-        <div className=" flex justify-center items-center gap-10 ">
-          <button className= "bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg ">キャンセル</button>
-          <button className= "bg-blue-500 text-white text-xl font-extrabold p-5 rounded-lg ">画像を削除</button>
-        </div>
-      </div>
     </div>
   );
 }
