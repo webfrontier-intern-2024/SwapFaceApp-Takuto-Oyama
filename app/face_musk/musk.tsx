@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
 interface ImageOverlayProps {
-  imgAUrl: string; // Aの画像のパス
+  dropImage: string; //Aの画像のパス
   boxData?: {
     probability: number;
     x_max: number;
@@ -12,7 +12,7 @@ interface ImageOverlayProps {
   emoji?: string; // 使用する絵文字
 }
 
-const ImageOverlay: React.FC<ImageOverlayProps> = ({ imgAUrl, emoji = '😄' , boxData}) => {
+const ImageOverlay: React.FC<ImageOverlayProps> = ({ dropImage, emoji = '😄' , boxData}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // boxDataがundefinedまたはnullの場合のデフォルト値を設定
@@ -34,9 +34,9 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({ imgAUrl, emoji = '😄' , b
         return;
       }
     
-      console.log("画像URL:", imgAUrl);
-      console.log("画像の幅と高さ:", canvas?.width, canvas?.height);
-      console.log("受け取ったboxData:", boxData);
+    //   console.log("画像URL:", dropImage);
+    //   console.log("画像の幅と高さ:", canvas?.width, canvas?.height);
+    //   console.log("受け取ったboxData:", boxData);
 
     if (!canvas) return;
 
@@ -61,10 +61,10 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({ imgAUrl, emoji = '😄' , b
         ctx.fillText(emoji, x_min + width / 2, y_min + height / 2);
     }
 
-    imgA.src = imgAUrl;
-  }, [imgAUrl, emoji,  ex_x_min, ex_y_min, width, height]);
+    imgA.src = dropImage;
+  }, [dropImage, emoji,  ex_x_min, ex_y_min, width, height]);
 
-  return <canvas ref={canvasRef} className='max-w-[400px] max-h-[400px]'></canvas>;
+  return <canvas ref={canvasRef} className='max-w-[700px] max-h-[400px]'></canvas>;
 };
 
 export default ImageOverlay;

@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
   // NextRequest の formData() メソッドを使用してフォームデータを取得
   const formData = await req.formData();
   const file = formData.get('file') as File | null;
-
     if (!file) {
       throw new Error('ファイルがアップロードされていません');
     }
@@ -32,7 +31,6 @@ export async function POST(req: NextRequest) {
     if (response.ok) {
       const apiResult = await response.json();
       const box = apiResult.result?.[0].box;
-      console.log("外部APIからのレスポンス:", JSON.stringify(apiResult, null, 2));
       return NextResponse.json({ message: '画像送信成功', box });
     } else {
       return NextResponse.json({ message: 'APIエラー', error: response.statusText }, { status: response.status });

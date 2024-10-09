@@ -4,6 +4,7 @@ import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import { CloudUpload, Check, MediaImage } from "iconoir-react";
 import ImageOverlay from "./face_musk/musk";
+import ErrorModal from "./componets/modal";
 
 interface BoxData {
   probability: number;
@@ -18,7 +19,9 @@ function MyDropzone() {
   const [isUploadSuccessful, setIsUploadSuccessful] = useState(false);
   const [isMaskApplied, setIsMaskApplied] = useState(false); 
   const [randomEmoji, setRandomEmoji] = useState<string>(''); 
-  const [jsonData, setJsonData] = useState<BoxData | null>(null); // JSONデータ
+  const [jsonData, setJsonData] = useState<BoxData | null>(null);
+  const [showErrorModal, setShowErrorModal] = useState(false); // モーダル表示フラグ
+  const [errorMessage, setErrorMessage] = useState(""); // エラーメッセージ
 
   // APIへ画像を送信する処理
   const handleSendImage = async (file: File) => {
@@ -27,7 +30,6 @@ function MyDropzone() {
 
     try {
       const apiUrl = "/api/upload";
-
       const response = await fetch(apiUrl, {
         method: "POST",
         body: formData,
@@ -35,13 +37,10 @@ function MyDropzone() {
       
       if (response.ok) {
         const result = await response.json();
-        console.log("APIリザルト", result);
         setIsUploadSuccessful(true);
   
         // APIからのboxデータを取得
         const box = result.box;
-        console.log("取得したboxデータ:", box);
-  
         if (box) {
           // boxデータをImageOverlayが期待する形式に変換
           const boxData: BoxData = {
@@ -52,19 +51,23 @@ function MyDropzone() {
             probability: box.probability || 1,
           };
   
-          setJsonData(boxData);
-        } else {
-          console.error("boxデータが取得できませんでした");
+        setJsonData(boxData);
         }
-  
-        // ランダムな絵文字を生成
+
         const emojis = ['😄', '😊', '😂', '🤣', '😎', '😍', '🤩', '😜', '😏', '🤔', '😴', '😈', '👻', '🎃', '💩'];
         setRandomEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
       } else {
-        console.error("APIエラー", response.statusText);
+        const errorResult = await response.json();
+        throw new Error(errorResult.error || `APIエラー: ${response.statusText} (${response.status})`);
       }
     } catch (error) {
-      console.error("API通信エラー", error);
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("予期しないエラーが発生しました");
+      }
+      setIsUploadSuccessful(false);
+      setShowErrorModal(true);
     }
   };
 
@@ -72,7 +75,7 @@ function MyDropzone() {
     const file = acceptedFiles[0];
     const fileUrl = URL.createObjectURL(file);
     setImagePreview(fileUrl);
-    handleSendImage(file); // ドロップ時にAPIに送信
+    handleSendImage(file); // 画像を送信
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -83,7 +86,7 @@ function MyDropzone() {
 
   // キャンセルボタンの処理
   const handleCancel = () => {
-    setImagePreview(null); // プレビュー用URLを削除
+    setImagePreview(null); // プレビュー画像を削除
     setJsonData(null); // 顔の座標をリセット
     setIsUploadSuccessful(false); // アップロード成功フラグをリセット
     setIsMaskApplied(false); // マスク適用フラグをリセット
@@ -91,22 +94,29 @@ function MyDropzone() {
 
   // マスクを適用する処理
   const handleApplyMask = () => {
-    setIsMaskApplied(true); // マスク適用をトリガー
+    setIsMaskApplied(true); // マスク適用
+  };
+
+  // モーダルを閉じる処理
+  const handleCloseModal = () => {
+    setShowErrorModal(false);
+    setImagePreview(null); // プレビュー画像を削除
   };
 
   return (
-    <div className="w-full max-w-4xl flex flex-col items-center isolate">
+    <div className="w-full max-w-1xl flex flex-col items-center isolate">
+      <ErrorModal show={showErrorModal} message={errorMessage} onClose={handleCloseModal} />
       {isMaskApplied && jsonData ? (
         <div className= "rounded-xl  flex flex-col item-center ">
-          <div className="m-4 flex flex-col items-center justify-center">
-            <div className="m-5">
+          <div className="m-4 mb-0 flex flex-col items-center justify-center">
+            <div className="mb-10">
               <ImageOverlay
-                imgAUrl={imagePreview!}
+                dropImage={imagePreview!}
                 emoji={randomEmoji} 
                 boxData={jsonData}
               />
             </div>
-            <button onClick={handleCancel} className="bg-blue-700 text-white text-xl font-bold p-5 rounded-lg">
+            <button onClick={handleCancel} className="bg-blue-700 text-white text-xl font-bold p-5 px-8 rounded-lg ">
               戻る
             </button>
           </div>
@@ -114,13 +124,13 @@ function MyDropzone() {
       ) : (
         <div
           {...getRootProps()}
-          className={`border-dashed border-4 p-10 w-full h-96 flex justify-center items-center text-center rounded-xl 
+          className={`border-dashed border-4 p-10 w-full h-4 sm:h-96 flex justify-center items-center text-center rounded-xl mb-8 
           ${isDragActive ? "border-blue-500 bg-black" : "border-white"}`}
         >
           <input {...getInputProps()} />
           {
             imagePreview ? (
-              <Image src={imagePreview} width={300} height={300} alt="Uploaded" className="max-h-full max-w-full object-contain" />
+              <Image src={imagePreview} width={600} height={400} alt="Uploaded" className="max-h-full max-w-full object-contain" />
             ) : (
               isDragActive ? (
                 <p className="text-blue-500 font-bold">ファイルをここにドロップしてください...</p>
@@ -131,19 +141,18 @@ function MyDropzone() {
           }
         </div>
       )}
-      <div className="mt-10 flex justify-center items-center ">
-        <div className=" flex justify-center items-center gap-10 ">
+      <div className="flex justify-center items-center ">
+        <div className="flex justify-center items-center gap-10">
         {isUploadSuccessful && !isMaskApplied && (
             <>
               <button
-                className="bg-blue-700 text-white text-xl font-bold p-5 rounded-lg"
-                onClick={handleCancel}> キャンセル
+                className="bg-red-800 text-white text-xl font-bold p-5 rounded-lg"
+                onClick={handleCancel}> 削除する
               </button>
-                <button
-                  className="bg-blue-700 text-white text-xl font-bold p-5 rounded-lg"
-                  onClick={handleApplyMask} >
-                  マスクする
-                </button>
+              <button
+                className="bg-blue-800 text-white text-xl font-bold p-5 rounded-lg"
+                onClick={handleApplyMask}>マスクする
+              </button>
             </>
           )}
         </div>
@@ -156,9 +165,9 @@ export default function Home() {
   return (
     <div className="flex  items-center min-h-screen justify-center">
       <section className="text-white body-font">
-        <div className="container px-5 py-20 mx-auto max-w-7xl">
+        <div className="container px-5 sm:py-20 mx-auto max-w-7xl">
           <div
-            className="p-[4rem] bg-[#818181] rounded-3xl neumorphism-container"
+            className="p-6 sm:p-[4rem] pb-8 bg-[#818181] rounded-3xl neumorphism-container"
             style={{
               boxShadow: `
                 inset -5px -5px 4px rgba(0, 0, 0, 0.2), 
@@ -167,7 +176,7 @@ export default function Home() {
               `,
             }}>
             <div className="absolute inset-0 bg-[#a6a6a6] mix-blend-color-burn pointer-events-none"/>
-            <section className="relative mb-10">
+            <section className="relative">
               <h1 className="sm:text-3xl text-2xl text-white font-black text-center mb-20">
                 顔マスク.js
               </h1>
