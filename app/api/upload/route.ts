@@ -30,8 +30,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (response.ok) {
-      const result = await response.json();
-      return NextResponse.json({ message: '画像送信成功', result });
+      const apiResult = await response.json();
+      const box = apiResult.result?.[0].box;
+      console.log("外部APIからのレスポンス:", JSON.stringify(apiResult, null, 2));
+      return NextResponse.json({ message: '画像送信成功', box });
     } else {
       return NextResponse.json({ message: 'APIエラー', error: response.statusText }, { status: response.status });
     }
