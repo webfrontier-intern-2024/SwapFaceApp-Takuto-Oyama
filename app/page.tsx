@@ -1,8 +1,11 @@
 "use client";
 import React, { useCallback, useState } from "react";
-import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
+//ライブラリ
+import { useDropzone } from 'react-dropzone';
 import { CloudUpload, Check, MediaImage } from "iconoir-react";
+import { Player } from "@lottiefiles/react-lottie-player";
+//pages
 import ImageOverlay from "./face_musk/musk";
 import ErrorModal from "./componets/modal";
 
@@ -15,13 +18,26 @@ interface BoxData {
 }
 
 function MyDropzone() {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isUploadSuccessful, setIsUploadSuccessful] = useState(false);
-  const [isMaskApplied, setIsMaskApplied] = useState(false); 
-  const [randomEmoji, setRandomEmoji] = useState<string>(''); 
-  const [jsonData, setJsonData] = useState<BoxData | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null); // プレビュー画像
+  const [isUploadSuccessful, setIsUploadSuccessful] = useState(false); // アップロード成功フラグ
+  const [isMaskApplied, setIsMaskApplied] = useState(false);  // マスク適用フラグ
+  const [randomEmoji, setRandomEmoji] = useState<string>(''); // ランダムな絵文字
+  const [jsonData, setJsonData] = useState<BoxData | null>(null); // 顔の座標データ
   const [showErrorModal, setShowErrorModal] = useState(false); // モーダル表示フラグ
   const [errorMessage, setErrorMessage] = useState(""); // エラーメッセージ
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    const fileUrl = URL.createObjectURL(file);
+    setImagePreview(fileUrl);
+    handleSendImage(file); // 画像を送信
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'image/png': [], 'image/jpeg': [], 'image/jpg': [] },
+    multiple: false // 一つのファイルのみ
+  });
 
   // APIへ画像を送信する処理
   const handleSendImage = async (file: File) => {
@@ -70,19 +86,6 @@ function MyDropzone() {
       setShowErrorModal(true);
     }
   };
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    const fileUrl = URL.createObjectURL(file);
-    setImagePreview(fileUrl);
-    handleSendImage(file); // 画像を送信
-  }, []);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: { 'image/png': [], 'image/jpeg': [], 'image/jpg': [] },
-    multiple: false // 一つのファイルのみ
-  });
 
   // キャンセルボタンの処理
   const handleCancel = () => {
@@ -133,7 +136,14 @@ function MyDropzone() {
               <Image src={imagePreview} width={600} height={400} alt="Uploaded" className="max-h-full max-w-full object-contain" />
             ) : (
               isDragActive ? (
-                <p className="text-blue-500 font-bold">ファイルをここにドロップしてください...</p>
+                <div className="flex flex-col items-center">
+                  <Player
+                          autoplay
+                          loop
+                          src="/lottie/upload.json" 
+                          style={{ height: "300px", width: "300px" }}
+                      />
+                </div>
               ) : (
                 <p className="text-gray-300 font-semibold">ファイルをドラッグ＆ドロップするか、クリックして選択してください</p>
               )
@@ -181,9 +191,9 @@ export default function Home() {
                 顔マスク.js
               </h1>
               <div className="flex flex-wrap m-4 -mt-8">
-                <div className="p-4 md:w-1/3 flex">
+                <div className="p-4  flex">
                   <CloudUpload height={50} width={40} color="#fff" />
-                  <div className="flex-grow pl-6 w-full max-w-full">
+                  <div className="flex-grow pl-6 w-full ">
                     <h2 className="text-white text-lg font-bold mb-2">
                       画像をドロップ
                     </h2>
@@ -192,25 +202,25 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-                <div className="p-4 md:w-1/3 flex">
+                <div className="p-4 flex">
                   <MediaImage height={50} width={40} color="#fff" />
                   <div className="flex-grow pl-6 w-full max-w-full">
                     <h2 className="text-white text-lg font-bold mb-2">
                       顔を検出
                     </h2>
                     <p className="leading-relaxed text-base">
-                      顔の座標を検出します
+                      人物の顔を検出します
                     </p>
                   </div>
                 </div>
-                <div className="p-4 md:w-1/3 flex ">
+                <div className="p-4 flex ">
                   <Check height={50} width={40} color="#fff"/>
-                  <div className="flex-grow pl-6 w-full max-w-full">
+                  <div className="flex-grow pl-6 ">
                     <h2 className="text-white text-lg font-bold mb-2 ">
                       マスク完了
                     </h2>
                     <p className="leading-relaxed text-base">
-                      顔にスタンプを貼ります
+                      顔に絵文字を貼ります
                     </p>
                   </div>
                 </div>

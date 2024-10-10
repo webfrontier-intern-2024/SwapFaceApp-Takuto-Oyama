@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
   const apiUrl = process.env.API_URL || '';
   const apiKey = process.env.API_KEY || '';  
   
-  try {
   // NextRequest の formData() メソッドを使用してフォームデータを取得
+  try {
   const formData = await req.formData();
   const file = formData.get('file') as File | null;
     if (!file) {

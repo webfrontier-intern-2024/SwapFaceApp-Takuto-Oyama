@@ -17,8 +17,11 @@ npm run dev
 - [x] キャンセルボタンのロジック
 - [x] 送信ボタンのロジック
 - [x] API周りのロジック
-- [ ] マスクした画像を表示
-- [ ] 戻るボタンのロジック
+- [x] マスクした画像を表示
+- [x] 戻るボタンのロジック
 
 ## ライブラリ
 - [react-dropzone](https://react-dropzone.js.org/)
+- [iconir](https://iconoir.com/)
+- [lottie](https://lottiefiles.com/jp/)
+- [Fremaer](https://www.framer.com/motion/)

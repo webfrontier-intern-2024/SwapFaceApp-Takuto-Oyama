@@ -1,4 +1,5 @@
 import React from "react";
+//ライブラリ
 import { Player } from "@lottiefiles/react-lottie-player";
 
 interface ModalProps {
@@ -8,7 +9,7 @@ interface ModalProps {
 }
 
 const ErrorModal: React.FC<ModalProps> = ({show,  message, onClose }) => {
-    if (!show) return null; // モーダルが表示されるべきでない場合は何も表示しない
+    if (!show) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">

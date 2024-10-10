@@ -8,7 +8,7 @@ interface ImageOverlayProps {
     y_max: number;
     x_min: number;
     y_min: number;
-  }; // JSONデータのbox内の座標
+  }; 
   emoji?: string; // 使用する絵文字
 }
 
