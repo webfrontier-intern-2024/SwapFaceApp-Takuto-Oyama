@@ -24,4 +24,3 @@ npm run dev
 - [react-dropzone](https://react-dropzone.js.org/)
 - [iconir](https://iconoir.com/)
 - [lottie](https://lottiefiles.com/jp/)
-- [Fremaer](https://www.framer.com/motion/)

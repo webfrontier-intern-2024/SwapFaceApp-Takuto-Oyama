@@ -9,7 +9,7 @@ interface ImageOverlayProps {
     x_min: number;
     y_min: number;
   }; 
-  emoji?: string; // 使用する絵文字
+  emoji?: string; 
 }
 
 const ImageOverlay: React.FC<ImageOverlayProps> = ({ dropImage, emoji = '😄' , boxData}) => {
@@ -33,10 +33,6 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({ dropImage, emoji = '😄' ,
         console.error('boxDataがundefinedです');
         return;
       }
-    
-    //   console.log("画像URL:", dropImage);
-    //   console.log("画像の幅と高さ:", canvas?.width, canvas?.height);
-    //   console.log("受け取ったboxData:", boxData);
 
     if (!canvas) return;
 
