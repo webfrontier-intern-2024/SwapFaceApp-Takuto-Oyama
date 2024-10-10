@@ -1,7 +1,9 @@
+"use client";
 import React, { useEffect, useRef } from 'react';
 
+//型定義（JSにコンパイルした際には削除される）
 interface ImageOverlayProps {
-  dropImage: string; //Aの画像のパス
+  dropImage: string; 
   boxData?: {
     probability: number;
     x_max: number;
@@ -39,15 +41,15 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({ dropImage, emoji = '😄' ,
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const imgA = new Image();
+    const bgImage = new Image();
 
-    imgA.onload = () => {
+    bgImage.onload = () => {
         // キャンバスのサイズを設定
-        canvas.width = imgA.width;
-        canvas.height = imgA.height;
+        canvas.width = bgImage.width;
+        canvas.height = bgImage.height;
 
         // Aの画像を描画
-        ctx.drawImage(imgA, 0, 0);
+        ctx.drawImage(bgImage, 0, 0);
 
         ctx.font = `${height}px serif`; 
         ctx.textAlign = 'center';        
@@ -57,8 +59,8 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({ dropImage, emoji = '😄' ,
         ctx.fillText(emoji, x_min + width / 2, y_min + height / 2);
     }
 
-    imgA.src = dropImage;
-  }, [dropImage, emoji,  ex_x_min, ex_y_min, width, height]);
+    bgImage.src = dropImage;
+  }, [dropImage, emoji,  ex_x_min, ex_y_min, width, height, boxData, x_min, y_min]);
 
   return <canvas ref={canvasRef} className='max-w-[700px] max-h-[400px]'></canvas>;
 };

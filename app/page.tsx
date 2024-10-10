@@ -42,7 +42,7 @@ function MyDropzone() {
   // APIへ画像を送信する処理
   const handleSendImage = async (file: File) => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', file);  // APIに送信するためにroute.tsに定義されたフォームデータを追加
 
     try {
       const apiUrl = "/api/upload";
@@ -73,12 +73,17 @@ function MyDropzone() {
         const emojis = ['😄', '😊', '😂', '🤣', '😎', '😍', '🤩', '😜', '😏', '🤔', '😴', '😈', '👻', '🎃', '💩'];
         setRandomEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
       } else {
-        const errorResult = await response.json();
-        throw new Error(errorResult.error || `APIエラー: ${response.statusText} (${response.status})`);
+        if (response.status === 400) {
+          setErrorMessage("顔の検出に失敗しました。");
+        } else {
+          setErrorMessage("APIエラー");
+        }
+        setIsUploadSuccessful(false);
+        setShowErrorModal(true);
       }
     } catch (error) {
       if (error instanceof Error) {
-        setErrorMessage(error.message);
+        setErrorMessage("アップロードに失敗しました。");
       } else {
         setErrorMessage("予期しないエラーが発生しました");
       }
@@ -190,7 +195,7 @@ export default function Home() {
               <h1 className="sm:text-3xl text-2xl text-white font-black text-center mb-20">
                 顔マスク.js
               </h1>
-              <div className="flex flex-wrap m-4 -mt-8">
+              <div className="flex flex-wrap m-4 -mt-8 justify-center">
                 <div className="p-4  flex">
                   <CloudUpload height={50} width={40} color="#fff" />
                   <div className="flex-grow pl-6 w-full ">
