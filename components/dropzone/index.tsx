@@ -21,7 +21,6 @@ function MyDropzone() {
     const [imagePreview, setImagePreview] = useState<string | null>(null); // プレビュー画像
     const [isUploadSuccessful, setIsUploadSuccessful] = useState(false); // アップロード成功フラグ
     const [isMaskApplied, setIsMaskApplied] = useState(false);  // マスク適用フラグ
-    const [randomEmoji, setRandomEmoji] = useState<string>(''); // ランダムな絵文字
     const [jsonData, setJsonData] = useState<BoxData | null>(null); // 顔の座標データ
     const [showErrorModal, setShowErrorModal] = useState(false); // モーダル表示フラグ
     const [errorMessage, setErrorMessage] = useState(""); // エラーメッセージ
@@ -68,9 +67,6 @@ function MyDropzone() {
                 };
                 setJsonData(boxData);
             }
-
-            const emojis = ['😄', '😊', '😂', '🤣', '😎', '😍', '🤩', '😜', '😏', '🤔', '😴', '😈', '👻', '🎃', '💩'];
-            setRandomEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
         } else {
             if (response.status === 400) {
             setErrorMessage("顔の検出に失敗しました。");
@@ -119,7 +115,6 @@ function MyDropzone() {
                         <div className="mb-10">
                             <ImageOverlay
                                 dropImage={imagePreview!}
-                                emoji={randomEmoji} 
                                 boxData={jsonData}
                             />
                         </div>
