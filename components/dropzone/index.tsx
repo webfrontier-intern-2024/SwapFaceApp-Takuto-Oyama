@@ -32,7 +32,6 @@ function MyDropzone() {
         handleSendImage(file); // 画像を送信
     }, []);
 
-
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         accept: { 'image/png': [], 'image/jpeg': [], 'image/jpg': [] },
@@ -45,45 +44,45 @@ function MyDropzone() {
         formData.append('file', file);  // APIに送信するためにroute.tsに定義されたフォームデータを追加
 
         try {
-        const apiUrl = "/api/upload";
-        const response = await fetch(apiUrl, {
-            method: "POST",
-            body: formData,
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            setIsUploadSuccessful(true);
+            const apiUrl = "/api/upload";
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                body: formData,
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                setIsUploadSuccessful(true);
 
-            // APIからのboxデータを取得
-            const box = result.box;
-            if (box) {
-                const boxData: BoxData = {
-                    x_max: box.x_max,
-                    y_max: box.y_max,
-                    x_min: box.x_min,
-                    y_min: box.y_min,
-                    probability: box.probability || 1,
-                };
-                setJsonData(boxData);
-            }
-        } else {
-            if (response.status === 400) {
-            setErrorMessage("顔の検出に失敗しました。");
+                // APIからのboxデータを取得
+                const box = result.box;
+                if (box) {
+                    const boxData: BoxData = {
+                        x_max: box.x_max,
+                        y_max: box.y_max,
+                        x_min: box.x_min,
+                        y_min: box.y_min,
+                        probability: box.probability || 1,
+                    };
+                    setJsonData(boxData);
+                }
             } else {
-            setErrorMessage("APIエラー");
+                if (response.status === 400) {
+                setErrorMessage("顔の検出に失敗しました。");
+                } else {
+                setErrorMessage("APIエラー");
+                }
+                setIsUploadSuccessful(false);
+                setShowErrorModal(true);
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                setErrorMessage("アップロードに失敗しました。");
+            } else {
+                setErrorMessage("予期しないエラーが発生しました");
             }
             setIsUploadSuccessful(false);
             setShowErrorModal(true);
-        }
-        } catch (error) {
-        if (error instanceof Error) {
-            setErrorMessage("アップロードに失敗しました。");
-        } else {
-            setErrorMessage("予期しないエラーが発生しました");
-        }
-        setIsUploadSuccessful(false);
-        setShowErrorModal(true);
         }
     };
 

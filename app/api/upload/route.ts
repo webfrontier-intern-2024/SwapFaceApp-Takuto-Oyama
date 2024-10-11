@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const config = {
-  api: {
-    bodyParser: false,  // JSONやURLエンコードされたデータをオブジェクト変換しない
-  },
-};
-
 // APIエンドポイントのメイン処理
 export async function POST(req: NextRequest) {
   const apiUrl = process.env.API_URL || '';
