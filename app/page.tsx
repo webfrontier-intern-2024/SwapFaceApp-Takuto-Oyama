@@ -1,10 +1,9 @@
-"use client";
+"use client"
 import React from "react";
 //ライブラリ
 import { CloudUpload, Check, MediaImage } from "iconoir-react";
 //pages
 import MyDropzone from "../components/dropzone";
-
 
 export default function Home() {
   return (

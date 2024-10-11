@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState} from "react";
 import Image from 'next/image';
 //ライブラリ
 import { useDropzone } from 'react-dropzone';
@@ -32,6 +32,7 @@ function MyDropzone() {
         setImagePreview(fileUrl);
         handleSendImage(file); // 画像を送信
     }, []);
+
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,

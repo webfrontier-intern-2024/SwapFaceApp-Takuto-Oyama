@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 //ライブラリ
 import { Player } from "@lottiefiles/react-lottie-player";
