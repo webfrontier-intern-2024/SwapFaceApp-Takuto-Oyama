@@ -12,13 +12,6 @@
     linear-gradient(45deg, rgba(34, 166, 214, 0.8), rgba(0, 0, 0, 0.1));
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
-
 body {
   color: var(--foreground);
   background: var(--background);
